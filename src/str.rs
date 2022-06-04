@@ -1,9 +1,11 @@
 use std::ffi::{OsStr, OsString};
 use std::iter::once;
 use std::os::windows::ffi::{OsStrExt, OsStringExt};
+use windows::core::PWSTR;
 
 pub trait FromWin32Str {
     fn from_wchar_lossy(wchar: &[u16]) -> Self;
+    fn from_pwstr_lossy(pwstr: PWSTR) -> Self;
 }
 
 impl FromWin32Str for String {
@@ -11,6 +13,14 @@ impl FromWin32Str for String {
         let end = wchar.iter().position(|&x| x == 0).unwrap_or(wchar.len());
         let truncated = &wchar[0..end];
         OsString::from_wide(truncated).to_string_lossy().into()
+    }
+
+    fn from_pwstr_lossy(pwstr: PWSTR) -> Self {
+        unsafe {
+            let len = (0..).take_while(|&i| *pwstr.0.offset(i) != 0).count();
+            let slice = std::slice::from_raw_parts(pwstr.0, len);
+            OsString::from_wide(slice).to_string_lossy().into()
+        }
     }
 }
 
