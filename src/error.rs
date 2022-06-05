@@ -1,6 +1,5 @@
-use std::os::windows::raw::HANDLE;
 use windows::core::Error;
-use windows::Win32::Foundation::{SetLastError, BOOL, ERROR_SUCCESS};
+use windows::Win32::Foundation::{SetLastError, BOOL, ERROR_SUCCESS, HANDLE, HWND};
 
 #[inline]
 /// Use to wrap fallible Win32 functions.
@@ -40,8 +39,29 @@ impl CheckError for BOOL {
 
 impl CheckError for HANDLE {
     fn check_error(self) -> windows::core::Result<Self> {
+        if self.is_invalid() {
+            Err(Error::from_win32())
+        } else {
+            Ok(self)
+        }
+    }
+}
+
+impl CheckError for HWND {
+    fn check_error(self) -> windows::core::Result<Self> {
         // If the function fails, the return value is NULL.
-        if self.is_null() {
+        if self.0 == 0 {
+            Err(Error::from_win32())
+        } else {
+            Ok(self)
+        }
+    }
+}
+
+impl CheckError for u16 {
+    fn check_error(self) -> windows::core::Result<Self> {
+        // If the function fails, the return value is zero
+        if self == 0 {
             Err(Error::from_win32())
         } else {
             Ok(self)

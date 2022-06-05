@@ -30,6 +30,12 @@ pub trait ToWin32Str {
 
 impl ToWin32Str for String {
     fn to_wchar(&self) -> Vec<u16> {
+        self.as_str().to_wchar()
+    }
+}
+
+impl ToWin32Str for str {
+    fn to_wchar(&self) -> Vec<u16> {
         OsStr::new(self).encode_wide().chain(once(0)).collect()
     }
 }

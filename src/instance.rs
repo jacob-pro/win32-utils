@@ -1,4 +1,4 @@
-use crate::error::CheckError;
+use crate::error::{check_error, CheckError};
 use crate::str::ToWin32Str;
 use std::ffi::c_void;
 use thiserror::Error;
@@ -39,11 +39,15 @@ impl UniqueInstance {
 
             let luid = data.AuthenticationId;
             let mutex_name = format!("{}-{}-{}", app_name, luid.HighPart, luid.LowPart).to_wchar();
-            let mutex = CreateMutexW(
-                std::ptr::null_mut(),
-                BOOL::from(true),
-                PCWSTR(mutex_name.as_ptr()),
-            )
+            // If the mutex is a named mutex and the object existed before this function call, the return value is a handle to the existing object
+            let mutex = check_error(|| {
+                CreateMutexW(
+                    std::ptr::null_mut(),
+                    BOOL::from(true),
+                    PCWSTR(mutex_name.as_ptr()),
+                )
+            })
+            .map(|r| r.unwrap())
             .map_err(|e| {
                 if e.code() == HRESULT::from(ERROR_ALREADY_EXISTS) {
                     return Error::AlreadyExists;
