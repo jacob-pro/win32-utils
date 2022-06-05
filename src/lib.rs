@@ -10,3 +10,6 @@ pub mod window;
 
 pub mod error;
 pub mod str;
+
+#[allow(non_snake_case)]
+pub mod macros;
