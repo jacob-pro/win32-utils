@@ -1,4 +1,4 @@
-use crate::error::{check_error};
+use crate::error::check_error;
 use crate::str::ToWin32Str;
 use std::ffi::c_void;
 use thiserror::Error;
