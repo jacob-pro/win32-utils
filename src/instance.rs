@@ -1,4 +1,4 @@
-use crate::error::{check_error, CheckError};
+use crate::error::{check_error};
 use crate::str::ToWin32Str;
 use std::ffi::c_void;
 use thiserror::Error;
@@ -21,7 +21,7 @@ impl UniqueInstance {
         unsafe {
             let mut token = HANDLE::default();
             OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &mut token)
-                .check_error()
+                .ok()
                 .map_err(Error::OpenProcessToken)?;
 
             let mut len = 0;
@@ -34,7 +34,7 @@ impl UniqueInstance {
                 std::mem::size_of_val(&data) as u32,
                 &mut len,
             )
-            .check_error()
+            .ok()
             .map_err(Error::GetTokenInformation)?;
 
             let luid = data.AuthenticationId;
