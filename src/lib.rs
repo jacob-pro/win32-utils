@@ -8,6 +8,10 @@ pub mod net;
 #[cfg_attr(docsrs, doc(cfg(feature = "window")))]
 pub mod window;
 
+#[cfg(feature = "instance")]
+#[cfg_attr(docsrs, doc(cfg(feature = "instance")))]
+pub mod instance;
+
 pub mod error;
 pub mod str;
 
