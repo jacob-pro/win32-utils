@@ -4,4 +4,5 @@
 #[cfg_attr(docsrs, doc(cfg(feature = "net")))]
 pub mod net;
 
+pub mod error;
 pub mod str;
