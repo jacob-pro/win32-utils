@@ -1,6 +1,7 @@
 use std::ffi::{OsStr, OsString};
 use std::iter::once;
 use std::os::windows::ffi::{OsStrExt, OsStringExt};
+use thiserror::Error;
 use windows::core::PWSTR;
 
 pub trait FromWin32Str {
@@ -26,16 +27,32 @@ impl FromWin32Str for String {
 
 pub trait ToWin32Str {
     fn to_wchar(&self) -> Vec<u16>;
+    fn copy_to_wchar_buffer(&self, buffer: &mut [u16]) -> Result<(), WcharCopyError>;
 }
 
-impl ToWin32Str for String {
+#[derive(Debug, Error)]
+#[error("The WCHAR encoded string exceeds the length of the buffer")]
+pub struct WcharCopyError;
+
+impl<T: AsRef<str>> ToWin32Str for T {
     fn to_wchar(&self) -> Vec<u16> {
-        self.as_str().to_wchar()
+        OsStr::new(self.as_ref())
+            .encode_wide()
+            .chain(once(0))
+            .collect()
     }
-}
 
-impl ToWin32Str for str {
-    fn to_wchar(&self) -> Vec<u16> {
-        OsStr::new(self).encode_wide().chain(once(0)).collect()
+    fn copy_to_wchar_buffer(&self, buffer: &mut [u16]) -> Result<(), WcharCopyError> {
+        let mut wide = self.to_wchar();
+        // It is ok to drop the terminating character
+        if wide.len() > buffer.len() + 1 {
+            return Err(WcharCopyError {});
+        }
+        //If buffer.len() is greater than wide.len(), then wide is extended by the
+        // difference, with each additional slot filled with 0.
+        // If buffer.len() is less than wide.len(), then wide is simply truncated.
+        wide.resize(buffer.len(), 0);
+        buffer.copy_from_slice(&wide);
+        Ok(())
     }
 }

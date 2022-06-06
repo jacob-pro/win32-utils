@@ -6,12 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = { version = "1.0.31", optional = true }
+thiserror = { version = "1.0.31" }
 
 [features]
 net = ["windows/Win32_Networking_WinSock"]
 window = ["windows/Win32_UI_WindowsAndMessaging"]
-instance = ["thiserror", "windows/Win32_System_Threading", "windows/Win32_Security"]
+instance = ["windows/Win32_System_Threading", "windows/Win32_Security"]
 console = ["windows/Win32_System_Console", "windows/Win32_UI_WindowsAndMessaging", "windows/Win32_System_Threading"]
 
 [dependencies.windows]
