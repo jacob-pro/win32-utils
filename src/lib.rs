@@ -12,6 +12,10 @@ pub mod window;
 #[cfg_attr(docsrs, doc(cfg(feature = "instance")))]
 pub mod instance;
 
+#[cfg(feature = "console")]
+#[cfg_attr(docsrs, doc(cfg(feature = "console")))]
+pub mod console;
+
 pub mod error;
 pub mod str;
 
