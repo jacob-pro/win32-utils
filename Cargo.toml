@@ -2,8 +2,10 @@
 name = "win32-utils"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "LGPL-2.1"
+description = "Assorted utility functions for Win32 programming in Rust"
+repository = "https://github.com/jacob-pro/win32-utils"
+homepage = "https://github.com/jacob-pro/win32-utils"
 
 [dependencies]
 thiserror = { version = "1.0.31" }
