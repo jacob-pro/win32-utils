@@ -14,7 +14,6 @@ thiserror = { version = "1.0.31" }
 net = ["windows/Win32_Networking_WinSock"]
 window = ["windows/Win32_UI_WindowsAndMessaging"]
 instance = ["windows/Win32_System_Threading", "windows/Win32_Security"]
-console = ["windows/Win32_System_Console", "windows/Win32_UI_WindowsAndMessaging", "windows/Win32_System_Threading"]
 
 [dependencies.windows]
 version = "0.37.0"

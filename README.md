@@ -5,3 +5,8 @@
 
 Assorted utility functions for Win32 programming in Rust
 
+Optional Features:
+
+- `net`: Conversion functions for win32 <-> Rust network addresses.
+- `window`: Helper functions for working with `HWND` Windows.
+- `instance`: Utility for enforcing a unique application instance.
