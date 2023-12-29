@@ -16,7 +16,7 @@ window = ["windows/Win32_UI_WindowsAndMessaging"]
 instance = ["windows/Win32_System_Threading", "windows/Win32_Security"]
 
 [dependencies.windows]
-version = "0.51.1"
+version = "0.52.0"
 features = [
     "Win32_Foundation",
 ]
