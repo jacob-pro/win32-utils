@@ -21,7 +21,6 @@ impl UniqueInstance {
         unsafe {
             let mut token = HANDLE::default();
             OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &mut token)
-                .ok()
                 .map_err(Error::OpenProcessToken)?;
 
             let mut len = 0;
@@ -30,30 +29,24 @@ impl UniqueInstance {
             GetTokenInformation(
                 token,
                 TokenStatistics,
-                ptr,
+                Some(ptr),
                 std::mem::size_of_val(&data) as u32,
                 &mut len,
             )
-            .ok()
             .map_err(Error::GetTokenInformation)?;
 
             let luid = data.AuthenticationId;
             let mutex_name = format!("{}-{}-{}", app_name, luid.HighPart, luid.LowPart).to_wchar();
             // If the mutex is a named mutex and the object existed before this function call, the return value is a handle to the existing object
-            let mutex = check_error(|| {
-                CreateMutexW(
-                    std::ptr::null_mut(),
-                    BOOL::from(true),
-                    PCWSTR(mutex_name.as_ptr()),
-                )
-            })
-            .map(|r| r.unwrap())
-            .map_err(|e| {
-                if e.code() == HRESULT::from(ERROR_ALREADY_EXISTS) {
-                    return Error::AlreadyExists;
-                }
-                Error::CreateMutexW(e)
-            })?;
+            let mutex =
+                check_error(|| CreateMutexW(None, BOOL::from(true), PCWSTR(mutex_name.as_ptr())))
+                    .map(|r| r.unwrap())
+                    .map_err(|e| {
+                        if e.code() == HRESULT::from(ERROR_ALREADY_EXISTS) {
+                            return Error::AlreadyExists;
+                        }
+                        Error::CreateMutexW(e)
+                    })?;
             Ok(UniqueInstance { mutex })
         }
     }
@@ -62,7 +55,7 @@ impl UniqueInstance {
 impl Drop for UniqueInstance {
     fn drop(&mut self) {
         unsafe {
-            CloseHandle(self.mutex);
+            CloseHandle(self.mutex).unwrap();
         }
     }
 }
